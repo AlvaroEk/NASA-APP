@@ -24,6 +24,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "NASA_API_KEY": "WhGQhWv2scvhRJb03vWWl0hX4UhlnBTb29zgecyi"
     }
   }
 }
