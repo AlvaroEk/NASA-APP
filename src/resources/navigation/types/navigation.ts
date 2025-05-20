@@ -5,4 +5,7 @@ export type RootStackParamList = {
     title: string;
     description: string;
   };
+  AsteroidDetail: {
+    asteroid: any;
+  };
 };

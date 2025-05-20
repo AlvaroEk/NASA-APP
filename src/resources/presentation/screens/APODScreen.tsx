@@ -1,43 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
-import axios from 'axios';
-
-interface ApodData {
-  title: string;
-  explanation: string;
-  url: string;
-  media_type: string;
-}
+import { useApodListViewModel } from '../viewmodels/useApodViewModel';
+import { Apod } from '../../domain/models/Apod'; // Asegúrate de ajustar la ruta si es diferente
 
 export default function ApodViewer() {
-  const [apodData, setApodData] = useState<ApodData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchAPOD = async () => {
-      const apiKey = 'DEMO_KEY';
-      const url = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}&count=5`;
-
-      try {
-        const response = await axios.get(url);
-        setApodData(response.data);
-      } catch (err: any) {
-        console.error('Error fetching APOD data:', err.message);
-        setError('Failed to fetch data. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAPOD();
-  }, []);
+  const { apods, loading, error } = useApodListViewModel();
 
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading APOD images...</Text>
+        <ActivityIndicator size="large" color="#800080" />
+        <Text>Cargando imágenes del APOD...</Text>
       </View>
     );
   }
@@ -52,15 +25,13 @@ export default function ApodViewer() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {apodData.map((item, index) => (
+      {apods.map((item: Apod, index: number) => (
         <View key={index} style={styles.card}>
           <Text style={styles.title}>{item.title}</Text>
-          {item.media_type === 'image' && (
-            <Image
-              source={{ uri: item.url }}
-              style={styles.image}
-              resizeMode="contain"
-            />
+          {item.media_type === 'image' ? (
+            <Image source={{ uri: item.url }} style={styles.image} resizeMode="contain" />
+          ) : (
+            <Text style={styles.description}>El contenido es un video: {item.url}</Text>
           )}
           <Text style={styles.description}>{item.explanation}</Text>
         </View>

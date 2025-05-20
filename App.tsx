@@ -1,6 +1,12 @@
 import React from 'react';
+import { Provider } from 'react-redux';
+import { store } from './src/store';
 import MainNavigator from './src/resources/navigation/MainNavigator';
 
 export default function App() {
-  return <MainNavigator />;
+  return (
+    <Provider store={store}>
+      <MainNavigator />
+    </Provider>
+  );
 }
