@@ -1,10 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
-// Screens
+// Pantallas
 import APODScreen from '../presentation/screens/APODScreen';
 import EPICScreen from '../presentation/screens/EPICScreen';
 import NASALibraryScreen from '../presentation/screens/NASALibraryScreen';
@@ -15,7 +15,7 @@ import TechTransferScreen from '../presentation/screens/TechTransferScreen';
 import RegisterScreen from '../presentation/screens/RegisterScreen';
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 function Tabs() {
   return (
@@ -25,9 +25,15 @@ function Tabs() {
           const iconName =
             route.name === 'APOD' ? 'images' :
             route.name === 'EPIC' ? 'globe' :
-            route.name === 'Library' ? 'albums' : 'planet';
-          return <Ionicons name={iconName} size={size} color={color} />;
+            route.name === 'Library' ? 'albums' :
+            route.name === 'Asteroids' ? 'planet' :
+            route.name === 'TechTransfer' ? 'construct' :
+            route.name === 'Registro' ? 'person-add' :
+            'alert';
+
+          return <Ionicons name={iconName as any} size={size} color={color} />;
         },
+        headerShown: false,
       })}
     >
       <Tab.Screen name="APOD" component={APODScreen} />
@@ -43,10 +49,27 @@ function Tabs() {
 const MainNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={Tabs} options={{ headerShown: false }} />
-        <Stack.Screen name="Detail" component={NASADetailScreen} />
-        <Stack.Screen name="AsteroidDetail" component={AsteroidDetailScreen} />
+      <Stack.Navigator
+        screenOptions={{
+          ...TransitionPresets.FadeFromBottomAndroid,
+          gestureEnabled: true,
+        }}
+      >
+        <Stack.Screen name="Home" component={Tabs} />
+        <Stack.Screen
+          name="Detail"
+          component={NASADetailScreen}
+          options={{
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+          }}
+        />
+        <Stack.Screen
+          name="AsteroidDetail"
+          component={AsteroidDetailScreen}
+          options={{
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

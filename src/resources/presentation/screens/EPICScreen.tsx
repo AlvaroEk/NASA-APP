@@ -9,15 +9,13 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import Animated, { ZoomInDown } from 'react-native-reanimated';
+import { NASA_API_KEY } from '@env';
 
 interface EpicItem {
   image: string;
   date: string;
   caption: string;
 }
-
-// 🔑 Usa tu clave real aquí
-const NASA_API_KEY = 'VgeyJVV0egimWCRldYQYex5Ms1XjeATAc4YV9Rgs'; 
 
 export default function EpicViewer() {
   const [epicData, setEpicData] = useState<EpicItem[]>([]);
@@ -27,7 +25,6 @@ export default function EpicViewer() {
   useEffect(() => {
     const fetchEPIC = async () => {
       const url = `https://api.nasa.gov/EPIC/api/natural/images?api_key=${NASA_API_KEY}`;
-
       try {
         const response = await axios.get(url);
         const items = response.data.slice(0, 5);
@@ -59,6 +56,11 @@ export default function EpicViewer() {
     return `https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${item.image}.png`;
   };
 
+  const isDaytime = (dateString: string) => {
+    const hour = new Date(dateString).getUTCHours();
+    return hour >= 6 && hour < 18;
+  };
+
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -78,21 +80,28 @@ export default function EpicViewer() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {epicData.map((item, index) => (
-        <Animated.View
-          key={index}
-          entering={ZoomInDown.delay(index * 100).duration(500)}
-          style={styles.card}
-        >
-          <Text style={styles.title}>📅 {item.date}</Text>
-          <Image
-            source={{ uri: getImageUrl(item) }}
-            style={styles.image}
-            resizeMode="contain"
-          />
-          <Text style={styles.description}>{item.caption}</Text>
-        </Animated.View>
-      ))}
+      {epicData.map((item, index) => {
+        const day = isDaytime(item.date);
+        return (
+          <Animated.View
+            key={index}
+            entering={ZoomInDown.delay(index * 100).duration(500)}
+            style={[styles.card, day ? styles.dayCard : styles.nightCard]}
+          >
+            <Text style={[styles.title, day ? styles.dayText : styles.nightText]}>
+              📅 {item.date}
+            </Text>
+            <Image
+              source={{ uri: getImageUrl(item) }}
+              style={styles.image}
+              resizeMode="contain"
+            />
+            <Text style={[styles.description, day ? styles.dayText : styles.nightText]}>
+              {item.caption}
+            </Text>
+          </Animated.View>
+        );
+      })}
     </ScrollView>
   );
 }
@@ -110,6 +119,8 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: 30,
     width: '100%',
+    borderRadius: 10,
+    padding: 15,
   },
   image: {
     width: '100%',
@@ -124,6 +135,18 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 15,
     textAlign: 'justify',
+  },
+  dayCard: {
+    backgroundColor: '#e6f7ff',
+  },
+  nightCard: {
+    backgroundColor: '#1c1c3c',
+  },
+  dayText: {
+    color: '#000',
+  },
+  nightText: {
+    color: '#fff',
   },
   errorText: {
     color: 'red',
