@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types/navigation';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 type DetailRouteProp = RouteProp<RootStackParamList, 'Detail'>;
 
@@ -11,9 +12,23 @@ export default function NASADetailScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="contain" />
-      <Text style={styles.description}>{description}</Text>
+      <Animated.Text entering={FadeInDown.duration(400)} style={styles.title}>
+        {title}
+      </Animated.Text>
+
+      <Animated.Image
+        entering={FadeInDown.delay(200).duration(400)}
+        source={{ uri: imageUrl }}
+        style={styles.image}
+        resizeMode="contain"
+      />
+
+      <Animated.Text
+        entering={FadeInDown.delay(400).duration(500)}
+        style={styles.description}
+      >
+        {description}
+      </Animated.Text>
     </ScrollView>
   );
 }

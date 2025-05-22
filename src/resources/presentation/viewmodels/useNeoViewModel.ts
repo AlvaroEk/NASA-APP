@@ -5,7 +5,7 @@ import { RootState } from '../../../store';
 
 export const useNeoViewModel = () => {
   const dispatch = useDispatch();
-  const { data, loading, error } = useSelector((state: RootState) => state.neo);
+  const { data, loading, error, fromCache } = useSelector((state: RootState) => state.neo);
   const [startDate, setStartDate] = useState('2025-05-19');
   const [endDate, setEndDate] = useState('2025-05-20');
 
@@ -17,6 +17,7 @@ export const useNeoViewModel = () => {
     neos: data,
     loading,
     error,
+    fromCache,
     startDate,
     endDate,
     setStartDate,

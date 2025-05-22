@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_KEY = 'DEMO_KEY'; // Usa tu clave real si tienes una
+const API_KEY = 'VgeyJVV0egimWCRldYQYex5Ms1XjeATAc4YV9Rgs'; // Usa tu clave real si tienes una
 
 export const NasaApiService = {
   getApod: () => axios.get(`https://api.nasa.gov/planetary/apod?api_key=${API_KEY}`),

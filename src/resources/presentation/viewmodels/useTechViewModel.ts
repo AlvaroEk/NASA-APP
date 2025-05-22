@@ -5,7 +5,7 @@ import { RootState } from '../../../store';
 
 export const useTechViewModel = () => {
   const dispatch = useDispatch();
-  const { data, loading, error } = useSelector((state: RootState) => state.tech);
+  const { data, loading, error, fromCache } = useSelector((state: RootState) => state.tech);
   const [query, setQuery] = useState('space');
 
   const search = () => {
@@ -15,13 +15,14 @@ export const useTechViewModel = () => {
   };
 
   useEffect(() => {
-    search(); // Ejecuta búsqueda inicial
+    search();
   }, []);
 
   return {
     results: data,
     loading,
     error,
+    fromCache,
     query,
     setQuery,
     search,

@@ -1,12 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+} from 'react-native';
 import axios from 'axios';
+import Animated, { ZoomInDown } from 'react-native-reanimated';
 
 interface EpicItem {
   image: string;
   date: string;
   caption: string;
 }
+
+// 🔑 Usa tu clave real aquí
+const NASA_API_KEY = 'VgeyJVV0egimWCRldYQYex5Ms1XjeATAc4YV9Rgs'; 
 
 export default function EpicViewer() {
   const [epicData, setEpicData] = useState<EpicItem[]>([]);
@@ -15,16 +26,25 @@ export default function EpicViewer() {
 
   useEffect(() => {
     const fetchEPIC = async () => {
-      const apiKey = 'DEMO_KEY';
-      const url = `https://api.nasa.gov/EPIC/api/natural/images?api_key=${apiKey}`;
+      const url = `https://api.nasa.gov/EPIC/api/natural/images?api_key=${NASA_API_KEY}`;
 
       try {
         const response = await axios.get(url);
         const items = response.data.slice(0, 5);
         setEpicData(items);
       } catch (err: any) {
-        console.error('Error fetching EPIC data:', err.message);
-        setError('Failed to fetch EPIC images.');
+        if (err.response) {
+          if (err.response.status === 429) {
+            setError('Límite de solicitudes excedido. Intenta más tarde.');
+          } else {
+            setError(`Error del servidor: ${err.response.status}`);
+          }
+        } else if (err.request) {
+          setError('No se recibió respuesta del servidor.');
+        } else {
+          setError('Error desconocido al obtener los datos.');
+        }
+        console.error('EPIC error:', err.message);
       } finally {
         setLoading(false);
       }
@@ -59,7 +79,11 @@ export default function EpicViewer() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {epicData.map((item, index) => (
-        <View key={index} style={styles.card}>
+        <Animated.View
+          key={index}
+          entering={ZoomInDown.delay(index * 100).duration(500)}
+          style={styles.card}
+        >
           <Text style={styles.title}>📅 {item.date}</Text>
           <Image
             source={{ uri: getImageUrl(item) }}
@@ -67,7 +91,7 @@ export default function EpicViewer() {
             resizeMode="contain"
           />
           <Text style={styles.description}>{item.caption}</Text>
-        </View>
+        </Animated.View>
       ))}
     </ScrollView>
   );

@@ -12,6 +12,7 @@ import NASADetailScreen from '../presentation/screens/NASADetailScreen';
 import AsteroidsScreen from '../presentation/screens/AsteroidsScreen';
 import AsteroidDetailScreen from '../presentation/screens/AsteroidDetailScreen';
 import TechTransferScreen from '../presentation/screens/TechTransferScreen';
+import RegisterScreen from '../presentation/screens/RegisterScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -34,6 +35,7 @@ function Tabs() {
       <Tab.Screen name="Library" component={NASALibraryScreen} />
       <Tab.Screen name="Asteroids" component={AsteroidsScreen} />
       <Tab.Screen name="TechTransfer" component={TechTransferScreen} />
+      <Tab.Screen name="Registro" component={RegisterScreen} />
     </Tab.Navigator>
   );
 }
