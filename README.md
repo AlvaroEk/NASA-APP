@@ -48,3 +48,18 @@ NASA-APP/
 ├── .env
 ├── App.tsx
 ├── README.md
+## 📦 Instalación
+npm install
+npx expo start
+## 🧠 Arquitectura y buenas prácticas
+Separación por capas: data, domain, presentation, ui
+
+Repositorios desacoplados de la API
+
+Casos de uso como orquestadores de lógica de negocio
+
+Tipado estricto con modelos de dominio
+
+Animaciones declarativas con Reanimated
+
+Integración de modo offline con AsyncStorage
