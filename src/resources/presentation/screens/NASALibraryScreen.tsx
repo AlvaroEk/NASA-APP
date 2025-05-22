@@ -1,39 +1,53 @@
+// Importaciones necesarias desde React y React Native
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, Image, StyleSheet, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Dimensions
 } from 'react-native';
+
+// Cliente HTTP para llamadas a la API de NASA
 import axios from 'axios';
+
+// Hooks y tipos de navegación
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types/navigation';
 
+// Definimos el tipo de cada ítem mostrado en la galería
 interface NasaItem {
   title: string;
   description: string;
   imageUrl: string;
 }
 
+// Tipo para navegación al detalle
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Detail'>;
 
 export default function NASALibraryScreen() {
-  const [searchTerm, setSearchTerm] = useState('galaxy');
-  const [query, setQuery] = useState('galaxy');
-  const [items, setItems] = useState<NasaItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Estados para búsqueda, resultados y control de carga
+  const [searchTerm, setSearchTerm] = useState('galaxy'); // Texto del input
+  const [query, setQuery] = useState('galaxy');           // Texto usado en la búsqueda
+  const [items, setItems] = useState<NasaItem[]>([]);     // Resultados de imágenes
+  const [loading, setLoading] = useState(true);           // Indicador de carga
+  const [error, setError] = useState<string | null>(null); // Mensaje de error
+
   const navigation = useNavigation<NavigationProp>();
+
+  // Definición de columnas para la galería
   const numColumns = 2;
   const imageSize = Dimensions.get('window').width / numColumns - 30;
 
+  // Efecto que ejecuta la búsqueda cada vez que cambia "query"
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        // Consulta a la API pública de la NASA
         const response = await axios.get(
           `https://images-api.nasa.gov/search?q=${encodeURIComponent(query)}&media_type=image`
         );
         const rawItems = response.data.collection.items;
 
+        // Filtramos y parseamos solo los ítems válidos con imágenes
         const parsedItems = rawItems
           .filter((item: any) => item.links?.[0]?.href)
           .map((item: any) => {
@@ -45,25 +59,27 @@ export default function NASALibraryScreen() {
             };
           });
 
-        setItems(parsedItems.slice(0, 30));
+        setItems(parsedItems.slice(0, 30)); // Limitamos a 30 elementos
         setError(null);
       } catch (err: any) {
         console.error('NASA LIBRARY error:', err.message);
         setError('Failed to fetch NASA library data.');
       } finally {
-        setLoading(false);
+        setLoading(false); // Terminamos la carga
       }
     };
 
     fetchData();
   }, [query]);
 
+  // Función para ejecutar la búsqueda (modifica "query" basado en el input)
   const handleSearch = () => {
     if (searchTerm.trim()) {
       setQuery(searchTerm.trim());
     }
   };
 
+  // Función para renderizar cada imagen de la galería
   const renderItem = ({ item }: { item: NasaItem }) => (
     <TouchableOpacity
       style={styles.gridItem}
@@ -81,6 +97,7 @@ export default function NASALibraryScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Formulario de búsqueda */}
       <View style={styles.searchContainer}>
         <TextInput
           value={searchTerm}
@@ -93,6 +110,7 @@ export default function NASALibraryScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Estados de carga, error o galería */}
       {loading ? (
         <View style={styles.centered}>
           <ActivityIndicator size="large" color="#800080" />
@@ -115,6 +133,7 @@ export default function NASALibraryScreen() {
   );
 }
 
+// Estilos del componente
 const styles = StyleSheet.create({
   container: {
     padding: 15,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; // Hooks de React
 import {
   View,
   Text,
@@ -6,11 +6,14 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
-} from 'react-native';
-import axios from 'axios';
-import Animated, { ZoomInDown } from 'react-native-reanimated';
-import { NASA_API_KEY } from '@env';
+} from 'react-native'; // Componentes de UI nativos
 
+import axios from 'axios'; // Cliente HTTP para llamadas a la API
+import Animated, { ZoomInDown } from 'react-native-reanimated'; // Animaciones
+
+import { NASA_API_KEY } from '@env'; // Importación de la API KEY desde archivo .env
+
+// Definimos el tipo de datos que devuelve la API EPIC
 interface EpicItem {
   image: string;
   date: string;
@@ -18,18 +21,24 @@ interface EpicItem {
 }
 
 export default function EpicViewer() {
+  // Estado para almacenar los datos obtenidos de la API
   const [epicData, setEpicData] = useState<EpicItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true); // Carga inicial
+  const [error, setError] = useState<string | null>(null); // Manejo de errores
 
+  // Se ejecuta al montar el componente
   useEffect(() => {
     const fetchEPIC = async () => {
+      // URL para obtener imágenes naturales de EPIC
       const url = `https://api.nasa.gov/EPIC/api/natural/images?api_key=${NASA_API_KEY}`;
+
       try {
+        // Llamada a la API
         const response = await axios.get(url);
-        const items = response.data.slice(0, 5);
-        setEpicData(items);
+        const items = response.data.slice(0, 5); // Solo 5 imágenes
+        setEpicData(items); // Actualizamos estado
       } catch (err: any) {
+        // Manejamos diferentes tipos de errores
         if (err.response) {
           if (err.response.status === 429) {
             setError('Límite de solicitudes excedido. Intenta más tarde.');
@@ -43,24 +52,27 @@ export default function EpicViewer() {
         }
         console.error('EPIC error:', err.message);
       } finally {
-        setLoading(false);
+        setLoading(false); // Finaliza la carga
       }
     };
 
-    fetchEPIC();
+    fetchEPIC(); // Ejecutamos la función
   }, []);
 
+  // Calcula la URL de la imagen con base en la fecha
   const getImageUrl = (item: EpicItem) => {
     const [date] = item.date.split(' ');
     const [year, month, day] = date.split('-');
     return `https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${item.image}.png`;
   };
 
+  // Determina si la imagen es de día (entre 06:00 y 18:00 UTC)
   const isDaytime = (dateString: string) => {
     const hour = new Date(dateString).getUTCHours();
     return hour >= 6 && hour < 18;
   };
 
+  // Vista de carga
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -70,6 +82,7 @@ export default function EpicViewer() {
     );
   }
 
+  // Vista de error
   if (error) {
     return (
       <View style={styles.centered}>
@@ -78,21 +91,22 @@ export default function EpicViewer() {
     );
   }
 
+  // Vista principal: lista de imágenes con animación y cambio de tema
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {epicData.map((item, index) => {
-        const day = isDaytime(item.date);
+        const day = isDaytime(item.date); // Determinamos si es de día o de noche
         return (
           <Animated.View
             key={index}
-            entering={ZoomInDown.delay(index * 100).duration(500)}
-            style={[styles.card, day ? styles.dayCard : styles.nightCard]}
+            entering={ZoomInDown.delay(index * 100).duration(500)} // Animación
+            style={[styles.card, day ? styles.dayCard : styles.nightCard]} // Estilo dinámico
           >
             <Text style={[styles.title, day ? styles.dayText : styles.nightText]}>
               📅 {item.date}
             </Text>
             <Image
-              source={{ uri: getImageUrl(item) }}
+              source={{ uri: getImageUrl(item) }} // Imagen desde la NASA
               style={styles.image}
               resizeMode="contain"
             />
@@ -106,6 +120,7 @@ export default function EpicViewer() {
   );
 }
 
+// Estilos de los componentes
 const styles = StyleSheet.create({
   container: {
     padding: 20,

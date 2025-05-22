@@ -1,15 +1,23 @@
+// Importaciones necesarias desde React y React Native
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+
+// Hooks de navegación para obtener los parámetros de la ruta
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types/navigation';
+
+// Animación de entrada usando Reanimated
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+// Definimos el tipo del parámetro de navegación para esta pantalla
 type AsteroidDetailRouteProp = RouteProp<RootStackParamList, 'AsteroidDetail'>;
 
 export default function AsteroidDetailScreen() {
+  // Obtenemos los parámetros pasados a través de la navegación
   const route = useRoute<AsteroidDetailRouteProp>();
   const { asteroid } = route.params;
 
+  // Si no hay datos del asteroide, mostramos mensaje de error
   if (!asteroid) {
     return (
       <View style={styles.centered}>
@@ -18,11 +26,14 @@ export default function AsteroidDetailScreen() {
     );
   }
 
+  // Si hay datos, los mostramos dentro de un ScrollView animado
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* Tarjeta principal con animación de aparición */}
       <Animated.View entering={FadeInDown.duration(500)} style={styles.card}>
         <Text style={styles.title}>{asteroid.name}</Text>
 
+        {/* Mapeamos y animamos cada detalle del asteroide */}
         {[
           `ID: ${asteroid.id}`,
           `Magnitud absoluta: ${asteroid.absolute_magnitude_h}`,
@@ -34,7 +45,7 @@ export default function AsteroidDetailScreen() {
         ].map((text, index) => (
           <Animated.Text
             key={index}
-            entering={FadeInDown.delay(200 + index * 100).springify()}
+            entering={FadeInDown.delay(200 + index * 100).springify()} // Animación escalonada
             style={styles.detail}
           >
             {text}
@@ -45,16 +56,25 @@ export default function AsteroidDetailScreen() {
   );
 }
 
+// Estilos del componente
 const styles = StyleSheet.create({
-  container: { padding: 20 },
+  container: { padding: 20 }, // Contenedor general
   card: {
     padding: 20,
     borderRadius: 10,
     backgroundColor: '#eaeaea',
-    elevation: 2,
+    elevation: 2, // Sombra para Android
   },
-  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' },
-  detail: { fontSize: 16, marginBottom: 8 },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  detail: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
   centered: {
     flex: 1,
     justifyContent: 'center',

@@ -1,3 +1,4 @@
+// Importaciones principales desde React y React Native
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -9,10 +10,15 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
+
+// Librerías para formularios y validación
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { StorageService } from '../../../service/storageService'; // Ajusta la ruta si es necesario
 
+// Servicio local para guardar usuarios usando AsyncStorage
+import { StorageService } from '../../../service/storageService';
+
+// Esquema de validación con Yup para el formulario
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().min(3, 'Mínimo 3 caracteres').required('Nombre requerido'),
   email: Yup.string().email('Email inválido').required('Email requerido'),
@@ -23,9 +29,10 @@ const RegisterSchema = Yup.object().shape({
 });
 
 export default function RegisterScreen() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [showUsers, setShowUsers] = useState(false);
+  const [users, setUsers] = useState<any[]>([]); // Estado para la lista de usuarios guardados
+  const [showUsers, setShowUsers] = useState(false); // Mostrar/Ocultar lista
 
+  // Carga los usuarios guardados desde AsyncStorage al montar el componente
   const fetchUsers = async () => {
     const savedUsers = await StorageService.load<any[]>('registered_users');
     setUsers(savedUsers || []);
@@ -35,12 +42,13 @@ export default function RegisterScreen() {
     fetchUsers();
   }, []);
 
+  // Manejo del envío del formulario
   const handleRegister = async (values: any, resetForm: () => void) => {
     try {
-      const updatedUsers = [...users, values];
-      await StorageService.save('registered_users', updatedUsers);
-      setUsers(updatedUsers);
-      resetForm();
+      const updatedUsers = [...users, values]; // Agrega nuevo usuario
+      await StorageService.save('registered_users', updatedUsers); // Guarda localmente
+      setUsers(updatedUsers); // Actualiza estado
+      resetForm(); // Limpia formulario
       Alert.alert('Éxito', 'Usuario guardado localmente');
     } catch (e) {
       Alert.alert('Error', 'No se pudo guardar el usuario');
@@ -51,6 +59,7 @@ export default function RegisterScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>Formulario de Registro 🚀</Text>
 
+      {/* Formulario controlado con Formik */}
       <Formik
         initialValues={{
           name: '',
@@ -70,6 +79,7 @@ export default function RegisterScreen() {
           touched,
         }) => (
           <>
+            {/* Campo Nombre */}
             <TextInput
               placeholder="Nombre"
               style={styles.input}
@@ -79,6 +89,7 @@ export default function RegisterScreen() {
             />
             {touched.name && errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
+            {/* Campo Email */}
             <TextInput
               placeholder="Correo electrónico"
               style={styles.input}
@@ -89,6 +100,7 @@ export default function RegisterScreen() {
             />
             {touched.email && errors.email && <Text style={styles.error}>{errors.email}</Text>}
 
+            {/* Campo Contraseña */}
             <TextInput
               placeholder="Contraseña"
               style={styles.input}
@@ -99,6 +111,7 @@ export default function RegisterScreen() {
             />
             {touched.password && errors.password && <Text style={styles.error}>{errors.password}</Text>}
 
+            {/* Campo Confirmar Contraseña */}
             <TextInput
               placeholder="Confirmar contraseña"
               style={styles.input}
@@ -111,11 +124,13 @@ export default function RegisterScreen() {
               <Text style={styles.error}>{errors.confirmPassword}</Text>
             )}
 
+            {/* Botón de registro */}
             <Button title="Registrar" onPress={handleSubmit as any} color="#800080" />
           </>
         )}
       </Formik>
 
+      {/* Botón para mostrar u ocultar usuarios registrados */}
       <TouchableOpacity
         onPress={() => setShowUsers(!showUsers)}
         style={styles.toggleButton}
@@ -125,6 +140,7 @@ export default function RegisterScreen() {
         </Text>
       </TouchableOpacity>
 
+      {/* Lista de usuarios registrados */}
       {showUsers && users.length > 0 && (
         <View style={styles.userList}>
           {users.map((user, index) => (
@@ -136,6 +152,7 @@ export default function RegisterScreen() {
         </View>
       )}
 
+      {/* Mensaje si no hay usuarios */}
       {showUsers && users.length === 0 && (
         <Text style={styles.noUsers}>No hay usuarios registrados</Text>
       )}
@@ -143,6 +160,7 @@ export default function RegisterScreen() {
   );
 }
 
+// Estilos del componente
 const styles = StyleSheet.create({
   container: {
     padding: 20,
