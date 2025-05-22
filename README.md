@@ -1,4 +1,3 @@
-# NASA-APP
 # 🚀 NASA-APP
 
 Aplicación móvil y web desarrollada con **React Native + Expo**, que consume múltiples APIs públicas de la **NASA**. Construida con arquitectura **CLEAN + MVVM**, principios **SOLID** y uso de patrones como **Repository**, **UseCase** y **Factory**.
